@@ -4,6 +4,7 @@
 import { LandTitleRegistryContext } from '/context/LandTitleRegistry';
 import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 export default function LandTitleRegistry() {
   const {
@@ -34,6 +35,7 @@ export default function LandTitleRegistry() {
     newArea: '',
     newDocumentHash: ''
   });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (currentAccount) {
@@ -96,20 +98,27 @@ export default function LandTitleRegistry() {
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-black text-white">
-      <header className="row-start-1">
+      <header className="row-start-1 w-full">
         <nav className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Land Title Registry</h1>
           {currentAccount && (
-            <button
-              className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-              onClick={disconnectWallet}
-            >
-              Disconnect Wallet
-            </button>
+            <div className="flex items-center gap-4">
+              <CopyToClipboard text={currentAccount} onCopy={() => setCopied(true)}>
+                <button className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5">
+                  {copied ? "Copied!" : "Copy Address"}
+                </button>
+              </CopyToClipboard>
+              <button
+                className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+                onClick={disconnectWallet}
+              >
+                Disconnect Wallet
+              </button>
+            </div>
           )}
         </nav>
       </header>
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full">
         <Image
           className="dark:invert"
           src="https://nextjs.org/icons/next.svg"
@@ -125,11 +134,12 @@ export default function LandTitleRegistry() {
 
         {/* Wallet Type Selection */}
         <div>
-          <label>
+          <label className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={useSmartWallet}
               onChange={handleWalletToggle}
+              className="form-checkbox"
             />
             Use Smart Wallet
           </label>
@@ -149,7 +159,7 @@ export default function LandTitleRegistry() {
         {fetchError && <p className="text-red-500">{fetchError}</p>}
 
         {currentAccount && (
-          <div className="land-titles flex flex-col gap-4">
+          <div className="land-titles flex flex-col gap-4 w-full">
             {landTitles.length > 0 ? (
               landTitles.map((title, index) => (
                 <div
@@ -174,53 +184,54 @@ export default function LandTitleRegistry() {
             e.preventDefault();
             handleRegisterLandTitle();
           }}
+          className="w-full max-w-lg"
         >
-          <h2>Register Land Title</h2>
-          <label>
-            ID:
+          <h2 className="text-lg font-bold mb-4">Register Land Title</h2>
+          <div className="mb-4">
+            <label className="block mb-2">ID:</label>
             <input
               type="number"
               value={newLandTitle.id}
               onChange={(e) => setNewLandTitle({ ...newLandTitle, id: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            Owner Address:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Owner Address:</label>
             <input
               type="text"
               value={newLandTitle.ownerAddress}
               onChange={(e) => setNewLandTitle({ ...newLandTitle, ownerAddress: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            Location:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Location:</label>
             <input
               type="text"
               value={newLandTitle.location}
               onChange={(e) => setNewLandTitle({ ...newLandTitle, location: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            Area:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Area:</label>
             <input
               type="number"
               value={newLandTitle.area}
               onChange={(e) => setNewLandTitle({ ...newLandTitle, area: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            Document Hash:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Document Hash:</label>
             <input
               type="text"
               value={newLandTitle.documentHash}
               onChange={(e) => setNewLandTitle({ ...newLandTitle, documentHash: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
+          </div>
           <button type="submit" className="bg-gray-700 text-white py-2 px-4 rounded">Register Land Title</button>
         </form>
 
@@ -230,53 +241,54 @@ export default function LandTitleRegistry() {
             e.preventDefault();
             handleUpdateLandTitle();
           }}
+          className="w-full max-w-lg mt-8"
         >
-          <h2>Update Land Title</h2>
-          <label>
-            ID:
+          <h2 className="text-lg font-bold mb-4">Update Land Title</h2>
+          <div className="mb-4">
+            <label className="block mb-2">ID:</label>
             <input
               type="number"
               value={updateLandTitle.id}
               onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, id: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            New Owner Address:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">New Owner Address:</label>
             <input
               type="text"
               value={updateLandTitle.newOwnerAddress}
               onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newOwnerAddress: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            New Location:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">New Location:</label>
             <input
               type="text"
               value={updateLandTitle.newLocation}
               onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newLocation: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            New Area:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">New Area:</label>
             <input
               type="number"
               value={updateLandTitle.newArea}
               onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newArea: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
-          <label>
-            New Document Hash:
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">New Document Hash:</label>
             <input
               type="text"
               value={updateLandTitle.newDocumentHash}
               onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newDocumentHash: e.target.value })}
               className="bg-gray-800 text-white p-2 rounded w-full"
             />
-          </label>
+          </div>
           <button type="submit" className="bg-gray-700 text-white py-2 px-4 rounded">Update Land Title</button>
         </form>
 
