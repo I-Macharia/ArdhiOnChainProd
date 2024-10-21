@@ -19,11 +19,11 @@ To get started with the project, follow these steps:
 Depending on your package manager of choice, run one of the following commands:
 
 npm install
-# or
+#### or
 yarn install
-# or
+#### or
 pnpm install
-# or
+#### or
 bun install
 
 3. **Run the Development Server**
@@ -31,11 +31,11 @@ bun install
 Start the development server with:
 
 npm run dev
-# or
+#### or
 yarn dev
-# or
+#### or
 pnpm dev
-# or
+#### or
 bun dev
 
 4. View in Browser 

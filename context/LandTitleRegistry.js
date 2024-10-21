@@ -1,113 +1,71 @@
+// LandTitleRegistry.js
 'use client';
-import { createContext, useEffect, useState } from 'react';
-import { ethers } from 'ethers';
-import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
+import { ethers } from "ethers";
+import WalletLink from "@coinbase/wallet-sdk";
+import React, { createContext, useState, useEffect } from "react";
 
 // INTERNAL IMPORTS
 import { LandTitleRegistry_ABI, LandTitleRegistry_ADDRESS } from './constants';
 
-// FETCHING SMART CONTRACT
-const fetchContract = (signerOrProvider) =>
-  new ethers.Contract(LandTitleRegistry_ADDRESS, LandTitleRegistry_ABI, signerOrProvider);
+// Set up Coinbase Wallet SDK
+const APP_NAME = "Land Title Registry";
+const APP_LOGO_URL = "https://example.com/logo.png";  // Replace with your app logo
+const DEFAULT_ETH_JSONRPC_URL = "https://api.developer.coinbase.com/rpc/v1/base-sepolia/xeKjyo9jlzsi9SkZKcxHYlYmSg2a8sdr"; // Replace with your RPC URL
+const DEFAULT_CHAIN_ID = 1;
+
+const walletLink = new WalletLink({
+  appName: APP_NAME,
+  appLogoUrl: APP_LOGO_URL,
+  darkMode: false,
+});
+
+const ethereum = walletLink.makeWeb3Provider(DEFAULT_ETH_JSONRPC_URL, DEFAULT_CHAIN_ID);
+const provider = new ethers.providers.Web3Provider(ethereum);
 
 export const LandTitleRegistryContext = createContext();
 
 export const LandTitleRegistryProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState(null);
+  const [useSmartWallet, setUseSmartWallet] = useState(false);
   const [error, setError] = useState(null);
-  const [provider, setProvider] = useState(null);
-  const [useSmartWallet, setUseSmartWallet] = useState(true); // Flag to toggle wallet type
 
-  useEffect(() => {
-    try {
-      const sdk = new CoinbaseWalletSDK({ appName: 'An Awesome App', appChainIds: [84532] });
-      const newProvider = sdk.makeWeb3Provider();
-      setProvider(newProvider);
-    } catch (error) {
-      console.error('Error initializing Coinbase Wallet SDK:', error);
-      setError('Failed to initialize wallet provider.');
-    }
-  }, []);
-  
-  // Function to connect the wallet
-  const [loading, setLoading] = useState(false);
-
+  // Connect wallet
   const connectWallet = async () => {
-    setLoading(true);
-    let accounts;
     try {
-      if (useSmartWallet) {
-              accounts = await provider.request({ method: 'eth_requestAccounts' });
-            }
-      else if (window.ethereum) {
-                accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-              }
-      else {
-                setError('MetaMask not detected. Please install it to connect.');
-                return;
-              }
-
-      if (accounts.length > 0) {
-        setCurrentAccount(accounts[0]);
-        setError(null); // Clear any previous errors
-      }
+      const accounts = await provider.send("eth_requestAccounts", []);
+      setCurrentAccount(accounts[0]);
     } catch (error) {
-      console.error('Error connecting to wallet:', error);
-      setError('Error connecting to wallet. Please try again.');
+      console.error("Error connecting wallet:", error);
+      setError("Failed to connect wallet.");
     }
-    setLoading(false);
   };
 
-  // Function to disconnect the wallet
-  const disconnectWallet = async () => {
+  // Disconnect wallet
+  const disconnectWallet = () => {
     setCurrentAccount(null);
-    // Optionally handle any necessary cleanup here
   };
 
-  // Function to get land details
+  // Smart contract interactions
+  const contractAddress = LandTitleRegistry_ADDRESS; // Replace with your contract address
+  const contractABI = LandTitleRegistry_ABI; // Replace with your contract ABI
+
   const getLandDetails = async (id) => {
-    setLoading(true);
-    if (!provider) {
-      return;
-    } // Ensure provider is initialized
-
-    const contract = fetchContract(provider);
-
-    try {
-      const landDetails = await contract.getLandDetails(id);
-      return {
-              isRegistered: landDetails.isRegistered,
-              ownerAddress: landDetails.ownerAddress,
-              location: landDetails.location,
-              area: landDetails.area.toString(),
-              documentHash: landDetails.documentHash,
-            };
-    } catch (error) {
-      console.error('Error fetching land details:', error);
-      setError('Failed to fetch land details. Please check the console for details.');
-    }
-    setLoading(false)
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    return await contract.getLandDetails(id);
   };
 
-  // Function to check if the wallet is connected
-  const ifWalletConnected = async () => {
-    if (!provider) {
-      return;
-    } // Ensure provider is initialized
-
-    try {
-      const accounts = await provider.request({ method: 'eth_accounts' });
-      if (accounts.length > 0) {
-        setCurrentAccount(accounts[0]);
-      }
-    } catch (error) {
-      console.error('Error checking wallet connection:', error);
-    }
+  const registerLandTitle = async (id, ownerAddress, location, area, documentHash) => {
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    await contract.registerLandTitle(id, ownerAddress, location, area, documentHash);
   };
 
-  useEffect(() => {
-    ifWalletConnected();
-  }, [provider]); // Depend on provider to ensure it's ready
+  const updateLandDetails = async (id, newOwnerAddress, newLocation, newArea, newDocumentHash) => {
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    await contract.updateLandDetails(id, newOwnerAddress, newLocation, newArea, newDocumentHash);
+  };
 
   return (
     <LandTitleRegistryContext.Provider
@@ -115,10 +73,12 @@ export const LandTitleRegistryProvider = ({ children }) => {
         currentAccount,
         connectWallet,
         disconnectWallet,
+        useSmartWallet,
+        setUseSmartWallet,
         getLandDetails,
-        error,
-        setUseSmartWallet, // Expose this function to toggle wallet type
-        useSmartWallet, // Provide the current wallet type flag
+        registerLandTitle,
+        updateLandDetails,
+        error
       }}
     >
       {children}
