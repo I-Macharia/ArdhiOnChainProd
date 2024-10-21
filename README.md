@@ -2,6 +2,8 @@
 
 ## Project Overview
 
+<iframe src="https://gamma.app/embed/2o2f73j2t34kcew" style="width: 700px; max-width: 100%; height: 450px" allow="fullscreen" title="Land Ownership Transparency in Africa"></iframe>
+
 This is a **Next.js** project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It leverages the power of React and server-side rendering for building web applications.
 
 ## Getting Started

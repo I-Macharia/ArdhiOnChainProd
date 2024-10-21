@@ -187,51 +187,18 @@ export default function LandTitleRegistry() {
           className="w-full max-w-lg"
         >
           <h2 className="text-lg font-bold mb-4">Register Land Title</h2>
-          <div className="mb-4">
-            <label className="block mb-2">ID:</label>
-            <input
-              type="number"
-              value={newLandTitle.id}
-              onChange={(e) => setNewLandTitle({ ...newLandTitle, id: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">Owner Address:</label>
-            <input
-              type="text"
-              value={newLandTitle.ownerAddress}
-              onChange={(e) => setNewLandTitle({ ...newLandTitle, ownerAddress: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">Location:</label>
-            <input
-              type="text"
-              value={newLandTitle.location}
-              onChange={(e) => setNewLandTitle({ ...newLandTitle, location: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">Area:</label>
-            <input
-              type="number"
-              value={newLandTitle.area}
-              onChange={(e) => setNewLandTitle({ ...newLandTitle, area: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">Document Hash:</label>
-            <input
-              type="text"
-              value={newLandTitle.documentHash}
-              onChange={(e) => setNewLandTitle({ ...newLandTitle, documentHash: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
+          {Object.keys(newLandTitle).map((key, index) => (
+            <div className="mb-4" key={index}>
+              <label className="block mb-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}: </label>
+              <input
+                type={key === 'id' || key === 'area' ? 'number' : 'text'}
+                value={newLandTitle[key]}
+                onChange={(e) => setNewLandTitle({ ...newLandTitle, [key]: e.target.value })}
+                className="bg-gray-800 text-white p-2 rounded w-full"
+                required
+              />
+            </div>
+          ))}
           <button type="submit" className="bg-gray-700 text-white py-2 px-4 rounded">Register Land Title</button>
         </form>
 
@@ -244,56 +211,28 @@ export default function LandTitleRegistry() {
           className="w-full max-w-lg mt-8"
         >
           <h2 className="text-lg font-bold mb-4">Update Land Title</h2>
-          <div className="mb-4">
-            <label className="block mb-2">ID:</label>
-            <input
-              type="number"
-              value={updateLandTitle.id}
-              onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, id: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">New Owner Address:</label>
-            <input
-              type="text"
-              value={updateLandTitle.newOwnerAddress}
-              onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newOwnerAddress: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">New Location:</label>
-            <input
-              type="text"
-              value={updateLandTitle.newLocation}
-              onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newLocation: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">New Area:</label>
-            <input
-              type="number"
-              value={updateLandTitle.newArea}
-              onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newArea: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">New Document Hash:</label>
-            <input
-              type="text"
-              value={updateLandTitle.newDocumentHash}
-              onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, newDocumentHash: e.target.value })}
-              className="bg-gray-800 text-white p-2 rounded w-full"
-            />
-          </div>
+          {Object.keys(updateLandTitle).map((key, index) => (
+            <div className="mb-4" key={index}>
+              <label className="block mb-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}: </label>
+              <input
+                type={key.includes('new') ? 'text' : 'number'}
+                value={updateLandTitle[key]}
+                onChange={(e) => setUpdateLandTitle({ ...updateLandTitle, [key]: e.target.value })}
+                className="bg-gray-800 text-white p-2 rounded w-full"
+                required
+              />
+            </div>
+          ))}
           <button type="submit" className="bg-gray-700 text-white py-2 px-4 rounded">Update Land Title</button>
         </form>
 
+        <div>
+          <p>Coming Soon</p>
+        </div>
+
         <div className="mt-2">
-          <a href="https://hash-file.online/" target="_blank" className="text-blue-500 underline">Click here to hash your document</a>
+          <a href="https://hash-file.online/" target="_blank" className="text-blue-500 underline">Click here to hash your document
+</a>
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
